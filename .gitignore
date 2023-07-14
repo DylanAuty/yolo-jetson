@@ -1,0 +1,4 @@
+*.swp
+checkpoints/*
+__pycache__
+.vscode
