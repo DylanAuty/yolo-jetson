@@ -8,4 +8,4 @@ then
 fi
 
 echo Receiving stream on port $port
-gst-launch-1.0 -v udpsrc port=$port ! application/x-rtp,encoding-name=H264,payload=96 ! rtph264depay ! avdec_h264 ! autovideosink sync=false
+gst-launch-1.0 -v udpsrc port=$port ! application/x-rtp,encoding-name=H264,payload=96 ! rtph264depay ! avdec_h264 ! videoconvert ! xvideosink sync=false
