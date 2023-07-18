@@ -1,7 +1,7 @@
 import sys
 import cv2
 import time
-
+import threading
 
 class VideoCaptureThreading:
     # Implementation adapted from https://github.com/gilbertfrancois/video-capture-async
