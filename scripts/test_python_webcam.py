@@ -51,7 +51,9 @@ if __name__ == "__main__":
     # Gstreamer pipeline to read RTP packets from port 5000, that it assumes are h264-encoded.
     print("Setting up stream")
 
-    vid = cv2.VideoCapture('\
+    # Using multi-threaded capture; replaces cv2.VideoCapture.
+    # If using multithreaded, add vid.start() and vid.stop() before and after the main capture loop.
+    vid = VideoCaptureThreading('\
             udpsrc port=5000 \
             ! application/x-rtp,encoding-name=H264,payload=96 \
             ! rtph264depay \
