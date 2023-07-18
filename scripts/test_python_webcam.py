@@ -4,7 +4,7 @@ import time
 import threading
 
 assert __package__ is not None, "Error: Must be run as a module to allow imports to work (python3 -m scripts.test_python_webcam)"
-from modules.VideoCaptureThreading import VideoCaptureThreading
+from yolojetson.VideoCaptureThreading import VideoCaptureThreading
 
 if __name__ == "__main__":
     # Gstreamer pipeline to read RTP packets from port 5000, that it assumes are h264-encoded.
