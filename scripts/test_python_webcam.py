@@ -43,6 +43,9 @@ class VideoCaptureThreading:
         self.started = False
         self.thread.join()
 
+    def isOpened(self):
+        return self.cap.isOpened()
+
     def __exit__(self, exec_type, exc_value, traceback):
         self.cap.release()
 
