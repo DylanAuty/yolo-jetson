@@ -4,11 +4,12 @@ import time
 
 
 class VideoCaptureThreading:
+    # Implementation adapted from https://github.com/gilbertfrancois/video-capture-async
     def __init__(self, src=0, width=640, height=480):
         self.src = src
         self.cap = cv2.VideoCapture(self.src)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+        #self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        #self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
         self.grabbed, self.frame = self.cap.read()
         self.started = False
         self.read_lock = threading.Lock()
@@ -65,6 +66,7 @@ if __name__ == "__main__":
     else:
         print("Successfully opened stream. Reading...")
 
+    vid.start()
     while True:
         start_time = time.time()
         ret, frame = vid.read()
@@ -72,12 +74,12 @@ if __name__ == "__main__":
             print("Failed to read from video stream.")
             continue
         if frame is not None:
-            print(f'Framerate: {1 / (time.time() - start_time)}')
             cv2.imshow(f'Frame', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         else:
             print("Frame read but is still None (gstreamer settings are likely wrong).")
 
+    vid.stop()
     vid.release()
     cv2.destroyAllWindows()
