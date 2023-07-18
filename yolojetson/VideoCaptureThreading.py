@@ -47,5 +47,8 @@ class VideoCaptureThreading:
     def isOpened(self):
         return self.cap.isOpened()
 
+    def release(self):
+        self.cap.release()  # Redundant because of self.__exit__() but here for compatibility reasons
+
     def __exit__(self, exec_type, exc_value, traceback):
         self.cap.release()
