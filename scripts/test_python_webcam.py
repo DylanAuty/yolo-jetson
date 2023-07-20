@@ -26,6 +26,7 @@ if __name__ == "__main__":
     else:
         # Using MJPEG encoding
         vid = VideoCaptureThreading('\
+                udpsrc port=5000 \
                 application/x-rtp,encoding-name=JPEG,payload=96 ! rtpjpegdepay ! jpegdec ! videoconvert ! ximagesink sync=false', cv2.CAP_GSTREAMER)
 
     if not vid.isOpened():
