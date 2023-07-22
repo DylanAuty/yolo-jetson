@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     # Using multi-threaded capture; replaces cv2.VideoCapture.
     # If using multithreaded, add vid.start() and vid.stop() before and after the main capture loop.
-    h264 = False
+    h264 = True
     if h264:
         vid = VideoCaptureThreading('\
                 udpsrc port=5000 \
@@ -27,7 +27,7 @@ if __name__ == "__main__":
         # Using MJPEG encoding
         vid = VideoCaptureThreading('\
                 udpsrc port=5000 \
-                application/x-rtp,encoding-name=JPEG,payload=96 ! rtpjpegdepay ! jpegdec ! videoconvert ! ximagesink sync=false', cv2.CAP_GSTREAMER)
+                ! application/x-rtp,encoding-name=JPEG,payload=96 ! rtpjpegdepay ! jpegdec ! videoconvert ! appsink sync=false drop=true', cv2.CAP_GSTREAMER)
 
     if not vid.isOpened():
         sys.exit("Error: could not open stream. \n \
