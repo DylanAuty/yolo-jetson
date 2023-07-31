@@ -1,10 +1,14 @@
 # TRTBaseEngine.py
 # A class to load a tensorrt engine, and run inference through it.
+import time
 import cv2
 import pycuda.autoinit
 import pycuda.driver as cuda
 import numpy as np
 import tensorrt as trt
+
+import yolojetson.utils
+import yolojetson.constants
 
 class TRTBaseEngine(object):
     def __init__(self, engine_path, imgsz=(640,640)):
@@ -84,7 +88,6 @@ class TRTBaseEngine(object):
 
     def get_fps(self):
         # warmup
-        import time
         img = np.ones((1,3,self.imgsz[0], self.imgsz[1]))
         img = np.ascontiguousarray(img, dtype=np.float32)
         for _ in range(20):

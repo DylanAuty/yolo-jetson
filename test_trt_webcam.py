@@ -1,13 +1,14 @@
+# test_trt_webcam.py
+# Testing script for running Yolov7 inference on an h264-encoded rtp stream on port 5000.
+# Displays the results as a video in an x window, so must be run with $DISPLAY set
+import argparse
 import cv2
 import time
 
-import yolojetson.utils
-import yolojetson.constants
 from yolojetson.VideoCaptureThreading import VideoCaptureThreading
 from yolojetson.TRTBaseEngine import TRTBaseEngine
 
-
-def main():
+def main(args):
     print("Setting up video stream")
     video = VideoCaptureThreading('\
             udpsrc port=5000 \
@@ -19,10 +20,12 @@ def main():
             ! appsink sync=false drop=true \
             ', cv2.CAP_GSTREAMER)
     print("Setting up prediction engine")
-    pred = TRTBaseEngine(engine_path='./checkpoints/yolov7_640-nms.trt', imgsz=(360,640))
+    pred = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(360,640))
     print("Starting capture loop")
     video.start()
     start_time = None
+
+    # Main capture/prediction/display loop.
     while True:
         start_time = time.time()
         ret, image = video.read()
@@ -31,10 +34,14 @@ def main():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
         cv2.setWindowTitle('frame', f'FPS: {1 / (time.time() - start_time):4.2}')
-    pred.get_fps()
+
     video.release()
     cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--checkpoint', default='./checkpoints/yolov7_640-nms.trt', help='Path to the tensorrt checkpoint/engine to use.')
+
+    args = parser.parse_args()
+    main(args)
