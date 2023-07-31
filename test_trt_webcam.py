@@ -56,7 +56,7 @@ class BaseEngine(object):
     def inference(self, img_path, conf=0.25):
         origin_img = cv2.imread(img_path)
         origin_img = cv2.cvtColor(origin_img, cv2.COLOR_BGR2RGB)
-        img, ratio = preproc(origin_img, self.imgsz, self.mean, self.std)
+        img, ratio = self.preproc(origin_img, self.imgsz, self.mean, self.std)
         
         num, final_boxes, final_scores, final_cls_inds = self.infer(img)
         final_boxes = np.reshape(final_boxes, (-1, 4))
@@ -72,7 +72,7 @@ class BaseEngine(object):
     def inference_image(self, origin_img, conf=0.25):
         #origin_img = cv2.imread(img_path)
         origin_img = cv2.cvtColor(origin_img, cv2.COLOR_BGR2RGB)
-        img, ratio = preproc(origin_img, self.imgsz, self.mean, self.std)
+        img, ratio = self.preproc(origin_img, self.imgsz, self.mean, self.std)
         
         num, final_boxes, final_scores, final_cls_inds = self.infer(img)
         final_boxes = np.reshape(final_boxes, (-1, 4))
@@ -96,29 +96,30 @@ class BaseEngine(object):
         _ = self.infer(img)
         print(1/(time.perf_counter() - t1), 'FPS')
 
-def preproc(image, input_size, mean, std, swap=(2, 0, 1)):
-    if len(image.shape) == 3:
-        padded_img = np.ones((input_size[0], input_size[1], 3)) * 114.0
-    else:
-        padded_img = np.ones(input_size) * 114.0
-    img = np.array(image)
-    r = min(input_size[0] / img.shape[0], input_size[1] / img.shape[1])
-    resized_img = cv2.resize(
-        img,
-        (int(img.shape[1] * r), int(img.shape[0] * r)),
-        interpolation=cv2.INTER_LINEAR,
-    ).astype(np.float32)
-    padded_img[: int(img.shape[0] * r), : int(img.shape[1] * r)] = resized_img
 
-    padded_img = padded_img[:, :, ::-1]
-    padded_img /= 255.0
-    if mean is not None:
-        padded_img -= mean
-    if std is not None:
-        padded_img /= std
-    padded_img = padded_img.transpose(swap)
-    padded_img = np.ascontiguousarray(padded_img, dtype=np.float32)
-    return padded_img, r
+    def preproc(self, image, input_size, mean, std, swap=(2, 0, 1)):
+        if len(image.shape) == 3:
+            padded_img = np.ones((input_size[0], input_size[1], 3)) * 114.0
+        else:
+            padded_img = np.ones(input_size) * 114.0
+        img = np.array(image)
+        r = min(input_size[0] / img.shape[0], input_size[1] / img.shape[1])
+        resized_img = cv2.resize(
+            img,
+            (int(img.shape[1] * r), int(img.shape[0] * r)),
+            interpolation=cv2.INTER_LINEAR,
+        ).astype(np.float32)
+        padded_img[: int(img.shape[0] * r), : int(img.shape[1] * r)] = resized_img
+
+        padded_img = padded_img[:, :, ::-1]
+        padded_img /= 255.0
+        if mean is not None:
+            padded_img -= mean
+        if std is not None:
+            padded_img /= std
+        padded_img = padded_img.transpose(swap)
+        padded_img = np.ascontiguousarray(padded_img, dtype=np.float32)
+        return padded_img, r
 
 
 _COLORS = np.array(
@@ -239,32 +240,35 @@ def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
 
     return img
 
-print("Setting up video stream")
-video = VideoCaptureThreading('\
-        udpsrc port=5000 \
-        ! application/x-rtp,encoding-name=H264,payload=96 \
-        ! rtph264depay \
-        ! avdec_h264 \
-        ! videoconvert \
-        ! video/x-raw,format=BGR \
-        ! appsink sync=false drop=true \
-        ', cv2.CAP_GSTREAMER)
-print("Setting up prediction engine")
-pred = BaseEngine(engine_path='./checkpoints/yolov7_640-nms.trt', imgsz=(360,640))
-print("Starting capture loop")
-video.start()
-start_time = None
-while True:
-    start_time = time.time()
-    ret, image = video.read()
-    origin_img = pred.inference_image(image)
-    cv2.imshow('frame', origin_img)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-    print(1 / (time.time() - start_time))
-#import  matplotlib.pyplot as plt
-#cv2.imwrite('out_frame.png', origin_img)
-pred.get_fps()
-video.release()
-cv2.destroyAllWindows()
 
+def main():
+    print("Setting up video stream")
+    video = VideoCaptureThreading('\
+            udpsrc port=5000 \
+            ! application/x-rtp,encoding-name=H264,payload=96 \
+            ! rtph264depay \
+            ! avdec_h264 \
+            ! videoconvert \
+            ! video/x-raw,format=BGR \
+            ! appsink sync=false drop=true \
+            ', cv2.CAP_GSTREAMER)
+    print("Setting up prediction engine")
+    pred = BaseEngine(engine_path='./checkpoints/yolov7_640-nms.trt', imgsz=(360,640))
+    print("Starting capture loop")
+    video.start()
+    start_time = None
+    while True:
+        start_time = time.time()
+        ret, image = video.read()
+        origin_img = pred.inference_image(image)
+        cv2.imshow('frame', origin_img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+        cv2.setWindowTitle('frame', f'FPS: {1 / (time.time() - start_time):4.2}')
+    pred.get_fps()
+    video.release()
+    cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    main()
