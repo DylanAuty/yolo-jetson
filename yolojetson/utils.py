@@ -7,13 +7,23 @@ import numpy as np
 import yolojetson.constants
 
 
-def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
+def visualise_predictions(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
+    """
+    Annotates an image with the given bounding boxes.
+
+    :param img (numpy.ndarray): The image to be annotated, shape HxWx3
+    :param boxes: List of bounding boxes in format [[start_x_0, start_y_0, end_x_0, end_y_0], [start_x_1, start_y_1, end_x_1, end_y_1], ...]
+    :param scores: List of confidence scores for each bbox.
+    :param cls_ids: List of class IDs for each bbox.
+    :param conf: List of confidences for each bbox.
+    :returns: numpy.ndarray of shape HxWx3 with bbox annotations superimposed.
+    """
     for i in range(len(boxes)):
-        box = boxes[i]
-        cls_id = int(cls_ids[i])
         score = scores[i]
         if score < conf:
             continue
+        box = boxes[i]
+        cls_id = int(cls_ids[i])
         x0 = int(box[0])
         y0 = int(box[1])
         x1 = int(box[2])
