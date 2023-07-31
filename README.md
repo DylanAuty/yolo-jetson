@@ -35,4 +35,4 @@ Then run:
 cd jetson-containers
 ./scripts/docker-build-yolo.sh
 ```
-which will compile OpenCV into .deb files, tar them together, and put them in `jetson-containers/packages`, before installing them in a new docker image. The resulting docker image is now ready to use.
+which will compile OpenCV into .deb files, tar them together, and put them in `jetson-containers/packages`, before installing them in a new docker image. The new docker image will also have all required Python packages installed.
