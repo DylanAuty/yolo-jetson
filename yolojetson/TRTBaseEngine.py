@@ -70,21 +70,20 @@ class TRTBaseEngine(object):
         origin_img = cv2.cvtColor(origin_img, cv2.COLOR_RGB2BGR)                      
         return origin_img
 
-    def inference_image(self, origin_img, conf=0.25, return_vis=False):
+    def inference_image(self, origin_img, conf=0.25):
         origin_img = cv2.cvtColor(origin_img, cv2.COLOR_BGR2RGB)
         img, ratio = self.preproc(origin_img, self.imgsz, self.mean, self.std)
         num, final_boxes, final_scores, final_cls_inds = self._infer(img)
         final_boxes = np.reshape(final_boxes, (-1, 4))
         num = num[0]
 
-        origin_img = None
         if num > 0:
             detections = {}
             detections['boxes'], detections['scores'], detections['cls_inds'] = final_boxes[:num]/ratio, 1+final_scores[:num], final_cls_inds[:num]
-            if return_vis:
-                origin_img = yolojetson.utils.visualise_predictions(origin_img, final_boxes, final_scores, final_cls_inds,
-                                conf=conf, class_names=self.class_names)
-                origin_img = cv2.cvtColor(origin_img, cv2.COLOR_RGB2BGR)
+            origin_img = yolojetson.utils.visualise_predictions(origin_img, final_boxes, final_scores, final_cls_inds,
+                            conf=conf, class_names=self.class_names)
+        origin_img = cv2.cvtColor(origin_img, cv2.COLOR_RGB2BGR)
+
         return origin_img, detections
 
     def get_fps(self):

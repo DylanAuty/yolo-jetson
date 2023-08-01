@@ -4,6 +4,7 @@
 import argparse
 import cv2
 import time
+import json
 
 from yolojetson.VideoCaptureThreading import VideoCaptureThreading
 from yolojetson.TRTBaseEngine import TRTBaseEngine
@@ -33,10 +34,12 @@ def main(args):
         start_time = time.time()
         ret, image = video.read()
         origin_img, most_recent_results = pred.inference_image(image)
+        most_recent_results['time'] = start_time
         cv2.imshow('frame', origin_img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
         cv2.setWindowTitle('frame', f'FPS: {1 / (time.time() - start_time):4.2}')
+        print(json.dumps(most_recent_results, indent=4))
 
     video.release()
     cv2.destroyAllWindows()
