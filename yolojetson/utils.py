@@ -26,8 +26,8 @@ def detection_to_json(dets, class_names):
     for i in range(len(dets['boxes'])):
         out[i] = dict(
                     bbox=dets['boxes'][i].tolist(),
-                    conf=dets['scores'][i],
-                    class_idx=dets['cls_inds'][i],
+                    conf=str(dets['scores'][i]),
+                    class_idx=str(dets['cls_inds'][i]),
                     class_name=class_names[dets['cls_inds'][i]]
                 )
 
