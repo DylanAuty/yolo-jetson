@@ -23,7 +23,7 @@ def detection_to_json(dets, class_names):
     if dets.get('boxes') is None:
         return "{}"
     out = {}
-    for i in len(dets['boxes']):
+    for i in range(len(dets['boxes'])):
         out[i] = dict(
                     bbox=dets['boxes'][i].tolist(),
                     conf=dets['scores'][i],
