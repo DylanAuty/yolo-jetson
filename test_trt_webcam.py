@@ -6,6 +6,7 @@ import cv2
 import time
 import json
 
+import yolojetson.utils
 from yolojetson.VideoCaptureThreading import VideoCaptureThreading
 from yolojetson.TRTBaseEngine import TRTBaseEngine
 
@@ -39,7 +40,7 @@ def main(args):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
         cv2.setWindowTitle('frame', f'FPS: {1 / (time.time() - start_time):4.2f}')
-        json_out = utils.detection_to_json(most_recent_results, class_names=pred.class_names)
+        json_out = yolojetson.utils.detection_to_json(most_recent_results, class_names=pred.class_names)
         print(json_out)
 
     video.release()
