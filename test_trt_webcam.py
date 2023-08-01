@@ -8,6 +8,8 @@ import time
 from yolojetson.VideoCaptureThreading import VideoCaptureThreading
 from yolojetson.TRTBaseEngine import TRTBaseEngine
 
+most_recent_results = {}
+
 def main(args):
     print("Setting up video stream")
     video = VideoCaptureThreading('\
@@ -20,16 +22,17 @@ def main(args):
             ! appsink sync=false drop=true \
             ', cv2.CAP_GSTREAMER)
     print("Setting up prediction engine")
-    pred = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(360,640))
+    pred = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(640,640))
+
+    # Main capture/prediction/display loop.
     print("Starting capture loop")
     video.start()
     start_time = None
-
-    # Main capture/prediction/display loop.
+    global most_recent_results
     while True:
         start_time = time.time()
         ret, image = video.read()
-        origin_img = pred.inference_image(image)
+        origin_img, most_recent_results = pred.inference_image(image)
         cv2.imshow('frame', origin_img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

@@ -36,7 +36,7 @@ class TRTBaseEngine(object):
             else:
                 self.outputs.append({'host': host_mem, 'device': device_mem})
                 
-    def infer(self, img):
+    def _infer(self, img):
         self.inputs[0]['host'] = np.ravel(img)
         # transfer data to the gpu
         for inp in self.inputs:
@@ -54,12 +54,12 @@ class TRTBaseEngine(object):
         data = [out['host'] for out in self.outputs]
         return data
 
-    def inference(self, img_path, conf=0.25):
+    def inference_path(self, img_path, conf=0.25):
         origin_img = cv2.imread(img_path)
         origin_img = cv2.cvtColor(origin_img, cv2.COLOR_BGR2RGB)
         img, ratio = self.preproc(origin_img, self.imgsz, self.mean, self.std)
         
-        num, final_boxes, final_scores, final_cls_inds = self.infer(img)
+        num, final_boxes, final_scores, final_cls_inds = self._infer(img)
         final_boxes = np.reshape(final_boxes, (-1, 4))
         num = num[0]
 
@@ -70,20 +70,19 @@ class TRTBaseEngine(object):
         origin_img = cv2.cvtColor(origin_img, cv2.COLOR_RGB2BGR)                      
         return origin_img
 
-    def inference_image(self, origin_img, conf=0.25):
-        #origin_img = cv2.imread(img_path)
+    def inference_image(self, origin_img, conf=0.25, return_vis=False):
         origin_img = cv2.cvtColor(origin_img, cv2.COLOR_BGR2RGB)
         img, ratio = self.preproc(origin_img, self.imgsz, self.mean, self.std)
         
-        num, final_boxes, final_scores, final_cls_inds = self.infer(img)
+        num, final_boxes, final_scores, final_cls_inds = self._infer(img)
         final_boxes = np.reshape(final_boxes, (-1, 4))
         num = num[0]
 
-        if num >0:
+        if num > 0:
             final_boxes, final_scores, final_cls_inds = final_boxes[:num]/ratio, 1+final_scores[:num], final_cls_inds[:num]
             origin_img = yolojetson.utils.visualise_predictions(origin_img, final_boxes, final_scores, final_cls_inds,
                              conf=conf, class_names=self.class_names)
-        origin_img = cv2.cvtColor(origin_img, cv2.COLOR_RGB2BGR)                      
+        origin_img = cv2.cvtColor(origin_img, cv2.COLOR_RGB2BGR)                 
         return origin_img
 
     def get_fps(self):
@@ -91,9 +90,9 @@ class TRTBaseEngine(object):
         img = np.ones((1,3,self.imgsz[0], self.imgsz[1]))
         img = np.ascontiguousarray(img, dtype=np.float32)
         for _ in range(20):
-            _ = self.infer(img)
+            _ = self._infer(img)
         t1 = time.perf_counter()
-        _ = self.infer(img)
+        _ = self._infer(img)
         print(1/(time.perf_counter() - t1), 'FPS')
 
 
