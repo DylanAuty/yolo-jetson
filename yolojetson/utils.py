@@ -3,9 +3,32 @@
 
 import cv2
 import numpy as np
+import json
 
 import yolojetson.constants
 
+
+def detection_to_json(dets, class_names):
+    """
+    Formats detection dictionary as JSON for output.
+
+    Expects detection dict to have keys:
+        'boxes': np.ndarray of np.ndarrays (list of start + stop coords for each box, [[xyxy], [xyxy], ...])
+        'scores': List of confidences for each detection
+        'cls_inds': Class index, should correspond to class_names
+    :param dets: dict containing detections. Each key should be indexable, the index should be the index of the detection.
+                 The length of each list should be identical and is the number of detections.
+    :returns: json of the dict (as a string)
+    """
+    out = {}
+    for i in len(dets[boxes]):
+        out[i] = dict(
+                    bbox=dets[boxes][i].tolist(),
+                    conf=dets[scores][i],
+                    class_idx=dets[cls_inds][i],
+                    class_name=class_names[dets[cls_inds][i]]
+                )
+    return json.dumps(out
 
 def visualise_predictions(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
     """

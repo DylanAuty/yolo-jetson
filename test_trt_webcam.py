@@ -39,7 +39,8 @@ def main(args):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
         cv2.setWindowTitle('frame', f'FPS: {1 / (time.time() - start_time):4.2}')
-        print(json.dumps(most_recent_results, indent=4))
+        json_out = utils.detection_to_json(most_recent_results, class_names=pred.class_names)
+        print(json_out)
 
     video.release()
     cv2.destroyAllWindows()

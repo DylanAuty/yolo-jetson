@@ -77,11 +77,12 @@ class TRTBaseEngine(object):
         final_boxes = np.reshape(final_boxes, (-1, 4))
         num = num[0]
 
+        detections = {}
         if num > 0:
-            detections = {}
             detections['boxes'], detections['scores'], detections['cls_inds'] = final_boxes[:num]/ratio, 1+final_scores[:num], final_cls_inds[:num]
-            origin_img = yolojetson.utils.visualise_predictions(origin_img, final_boxes, final_scores, final_cls_inds,
+            origin_img = yolojetson.utils.visualise_predictions(origin_img, detections['boxes'], detections['scores'], detections['cls_inds'],
                             conf=conf, class_names=self.class_names)
+
         origin_img = cv2.cvtColor(origin_img, cv2.COLOR_RGB2BGR)
 
         return origin_img, detections
