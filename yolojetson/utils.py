@@ -20,15 +20,19 @@ def detection_to_json(dets, class_names):
                  The length of each list should be identical and is the number of detections.
     :returns: json of the dict (as a string)
     """
+    if dets.get('boxes') is None:
+        return "{}"
     out = {}
-    for i in len(dets[boxes]):
+    for i in len(dets['boxes']):
         out[i] = dict(
-                    bbox=dets[boxes][i].tolist(),
-                    conf=dets[scores][i],
-                    class_idx=dets[cls_inds][i],
-                    class_name=class_names[dets[cls_inds][i]]
+                    bbox=dets['boxes'][i].tolist(),
+                    conf=dets['scores'][i],
+                    class_idx=dets['cls_inds'][i],
+                    class_name=class_names[dets['cls_inds'][i]]
                 )
-    return json.dumps(out
+
+    out['timestamp'] = dets.get('timestamp')
+    return json.dumps(out)
 
 def visualise_predictions(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
     """

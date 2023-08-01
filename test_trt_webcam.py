@@ -34,11 +34,11 @@ def main(args):
         start_time = time.time()
         ret, image = video.read()
         origin_img, most_recent_results = pred.inference_image(image)
-        most_recent_results['time'] = start_time
+        most_recent_results['timestamp'] = start_time
         cv2.imshow('frame', origin_img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-        cv2.setWindowTitle('frame', f'FPS: {1 / (time.time() - start_time):4.2}')
+        cv2.setWindowTitle('frame', f'FPS: {1 / (time.time() - start_time):4.2f}')
         json_out = utils.detection_to_json(most_recent_results, class_names=pred.class_names)
         print(json_out)
 
