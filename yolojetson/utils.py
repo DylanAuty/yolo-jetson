@@ -32,7 +32,7 @@ def detection_to_json(dets, class_names):
                 )
 
     out['timestamp'] = dets.get('timestamp')
-    return json.dumps(out)
+    return json.dumps(out, indent=4)
 
 def visualise_predictions(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
     """
