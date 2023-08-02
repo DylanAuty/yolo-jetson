@@ -28,7 +28,7 @@ class ServerAsync:
     def start(self):
         # Start video stream and server
         self.video.start()
-        self.server = SimpleJSONRPCServer(('127.0.0.1', self.args.port))
+        self.server = SimpleJSONRPCServer(('0.0.0.0', self.args.port))
         self.server.register_function(self.run_inference)
         self.server.serve_forever()
         print(f'Server listening on port {self.args.port}...')
