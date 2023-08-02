@@ -10,7 +10,7 @@ def main(args):
     while True:
         start_time = time.time()
         response = server.run_inference()
-        #print(response)
+        print(response)
         print(f'FPS: {1 / (time.time() - start_time):4.2f}')
 
 

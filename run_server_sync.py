@@ -10,7 +10,7 @@ import yolojetson.utils
 from yolojetson.VideoCaptureThreading import VideoCaptureThreading
 from yolojetson.TRTBaseEngine import TRTBaseEngine
 
-class ServerAsync:
+class ServerSync:
     def __init__(self, args):
         self.args = args
         self.video = VideoCaptureThreading(f'\
@@ -36,15 +36,16 @@ class ServerAsync:
 
     def run_inference(self):
         ret, image = self.video.read()
+        timestamp = time.time()
         origin_img, most_recent_results = self.engine.inference_image(image)
-        most_recent_results['timestamp'] = time.time()
+        most_recent_results['timestamp'] = timestamp
         detections_json = yolojetson.utils.detection_to_json(most_recent_results, class_names=self.engine.class_names)
         return detections_json
 
 
 def main(args):
     # Instantiate and start up the server
-    server = ServerAsync(args)
+    server = ServerSync(args)
     server.start()
 
 

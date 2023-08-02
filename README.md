@@ -36,3 +36,49 @@ cd jetson-containers
 ./scripts/docker-build-yolo.sh
 ```
 which will compile OpenCV into .deb files, tar them together, and put them in `jetson-containers/packages`, before installing them in a new docker image. The new docker image will also have all required Python packages installed.
+
+## Running the server
+To start the server, start the docker container and then run `python3 run_server_sync.py`. By default, this will serve over HTTP on port 8080. You can change this if needed.
+
+## Running a client
+An example test client that repeatedly polls the server for detections is found in `run_client_test.py`. The server exposes one method: `run_inference()` will grab a video frame, run inference on it, and return a JSON string containing the detections.
+
+## JSON Format
+The JSON containing the detections contains:
+	- The unix timestamp field `timestamp` from the moment the video frame was grabbed,
+	- N other fields representing N detections. Each detection's key in the JSON object is an integer beginning at 0. Detection objects contain:
+		- `bbox`: Array of start and end coordinates for bounding box in the form (x, y, x, y), 
+		- `conf`: Confidence of the detection, 
+		- `class_idx`: Class index, 
+		- `class_name`: Class name.
+
+An example with two detections is shown below:
+
+```json
+{
+	"timestamp": 1691000693.0368967,
+    "0": {
+        "bbox": [
+            617.0,
+            328.0,
+            656.0,
+            358.0
+        ],
+        "conf": "0.4790039",
+        "class_idx": "9",
+        "class_name": "motor"
+    },
+    "1": {
+        "bbox": [
+            574.0,
+            365.5,
+            621.0,
+            401.0
+        ],
+        "conf": "0.44335938",
+        "class_idx": "9",
+        "class_name": "motor"
+    }
+}
+```
+
