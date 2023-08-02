@@ -2,6 +2,7 @@
 # Instantiate and start the JSON-RPC YOLO inference server.
 # This version only runs inference on-demand, and so is slower.
 import argparse
+import time
 import cv2
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 
@@ -30,13 +31,14 @@ class ServerAsync:
         self.server = SimpleJSONRPCServer(('127.0.0.1', self.args.port))
         self.server.register_function(self.run_inference)
         self.server.serve_forever()
+        print(f'Server listening on port {self.args.port}...')
 
 
     def run_inference(self):
         ret, image = self.video.read()
         origin_img, most_recent_results = self.engine.inference_image(image)
-        most_recent_results['timestamp'] = start_time
-        json_out = yolojetson.utils.detection_to_json(most_recent_results, class_names=self.engine.class_names)
+        most_recent_results['timestamp'] = time.time()
+        detections_json = yolojetson.utils.detection_to_json(most_recent_results, class_names=self.engine.class_names)
         return detections_json
 
 
