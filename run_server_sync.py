@@ -10,7 +10,8 @@ from yolojetson.VideoCaptureThreading import VideoCaptureThreading
 from yolojetson.TRTBaseEngine import TRTBaseEngine
 
 class ServerAsync:
-    def __init__(args):
+    def __init__(self, args):
+        self.args = args
         self.video = VideoCaptureThreading(f'\
                  udpsrc port={args.video_port} \
                  ! application/x-rtp,encoding-name=H264,payload=96 \
@@ -26,7 +27,7 @@ class ServerAsync:
     def start(self):
         # Start video stream and server
         self.video.start()
-        self.server = SimpleJSONRPCServer(('127.0.0.1', args.port))
+        self.server = SimpleJSONRPCServer(('127.0.0.1', self.args.port))
         self.server.register_function(self.run_inference)
         self.server.serve_forever()
 
