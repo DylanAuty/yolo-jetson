@@ -2,6 +2,8 @@
 # Threaded implementation of the inference engine.
 import cv2
 import threading
+import time
+import copy
 
 import yolojetson.utils
 from yolojetson.VideoCaptureThreading import VideoCaptureThreading
@@ -35,10 +37,9 @@ class InferenceEngineThreaded:
 
     def update(self):
         while self.started:
-            grabbed, frame = self.cap.read()
-            ret, image = video.read()
+            ret, image = self.video.read()
             timestamp = time.time()
-            annotated_image, detections = pred.inference_image(image)
+            annotated_image, detections = self.engine.inference_image(image)
             detections['timestamp'] = timestamp
             detections = yolojetson.utils.detection_to_json(detections, class_names=self.engine.class_names)
             with self.read_lock:
@@ -47,8 +48,8 @@ class InferenceEngineThreaded:
 
     def read(self):
         with self.read_lock:
-            annotated_image = self.annotated_image.copy()
-            detections = self.detections.copy()
+            annotated_image = copy.deepcopy(self.annotated_image)
+            detections = copy.deepcopy(self.detections)
         return detections, annotated_image
 
     def stop(self):

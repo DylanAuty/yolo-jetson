@@ -17,8 +17,11 @@ def main(args):
                               ! appsink sync=false drop=true',
                     video_api_pref=cv2.CAP_GSTREAMER,
                     checkpoint=args.checkpoint)
-    detections_json, annotated_image = engine.read()
-    print(detections_json)
+    engine.start()
+    while True:
+        detections_json, annotated_image = engine.read()
+        cv2.imshow('frame', annotated_image)
+        print(detections_json)
 
 
 
