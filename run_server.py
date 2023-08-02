@@ -2,7 +2,7 @@
 # Instantiate and start the JSON-RPC YOLO inference server.
 import argparse
 import cv2
-from jsonrpclib.SimpleJSONRPCSerer import SimpleJSONRPCServer
+from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 
 from yolojetson.InferenceEngineThreaded import InferenceEngineThreaded
 
