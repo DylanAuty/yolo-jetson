@@ -1,5 +1,6 @@
-# run_server.py
+# run_server_async.py
 # Instantiate and start the JSON-RPC YOLO inference server.
+# This version runs inference constantly, so requests should be served instantly.
 import argparse
 import cv2
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
