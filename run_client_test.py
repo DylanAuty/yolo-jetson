@@ -1,5 +1,6 @@
 # run_client_test.py
 # Instantiates a JSON-RPC client, then polls it for results as fast as it can.
+import argparse
 import time
 import jsonrpclib
 import json
@@ -11,7 +12,6 @@ def main(args):
         response = server.run_inference()
         #print(response)
         print(f'FPS: {1 / (time.time() - start_time):4.2f}')
-    
 
 
 if __name__ == "__main__":
