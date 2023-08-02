@@ -5,30 +5,44 @@ import argparse
 import cv2
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
 
+import yolojetson.utils
+from yolojetson.VideoCaptureThreading import VideoCaptureThreading
+from yolojetson.TRTBaseEngine import TRTBaseEngine
+
+class ServerAsync:
+    def __init__(args):
+        self.video = VideoCaptureThreading(f'\
+                 udpsrc port={args.video_port} \
+                 ! application/x-rtp,encoding-name=H264,payload=96 \
+                 ! rtph264depay \
+                 ! avdec_h264 \
+                 ! videoconvert \
+                 ! video/x-raw,format=BGR \
+                 ! appsink sync=false drop=true \
+                 ', cv2.CAP_GSTREAMER)
+        self.engine = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(640,640))
+
+
+    def start(self):
+        # Start video stream and server
+        self.video.start()
+        self.server = SimpleJSONRPCServer(('127.0.0.1', args.port))
+        self.server.register_function(self.run_inference)
+        self.server.serve_forever()
+
+
+    def run_inference(self):
+        ret, image = self.video.read()
+        origin_img, most_recent_results = self.engine.inference_image(image)
+        most_recent_results['timestamp'] = start_time
+        json_out = yolojetson.utils.detection_to_json(most_recent_results, class_names=self.engine.class_names)
+        return detections_json
+
+
 def main(args):
-    # Setup stream and inference engine
-    global video = VideoCaptureThreading(f'\
-             udpsrc port={args.video_port} \
-             ! application/x-rtp,encoding-name=H264,payload=96 \
-             ! rtph264depay \
-             ! avdec_h264 \
-             ! videoconvert \
-             ! video/x-raw,format=BGR \
-             ! appsink sync=false drop=true \
-             ', cv2.CAP_GSTREAMER)
-    global engine = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(640,640))
-    video.start()
-
-    # Setup server and start
-    server = SimpleJSONRPCServer(('127.0.0.1', args.port))
-    server.register_function(run_inference)
-    server.serve_forever()
-
-
-def run_inference():
-    detections_json, annotated_image = engine.read()
-    print(detections_json)
-    return detections_json
+    # Instantiate and start up the server
+    server = ServerAsync(args)
+    server.start()
 
 
 if __name__ == "__main__":
