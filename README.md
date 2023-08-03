@@ -6,12 +6,12 @@ The work here builds on the work done by Adrian Lopez-Rodriguez and Nelson Da Si
 
 
 ## Quickstart tl;dr
-	1. Install Docker and enable non-root docker management
-	2. Add `"default-runtime": "nvidia"` to your `/etc/docker/daemon.json`:
-	3. Build container: `cd jetson-containers && ./scripts/docker_build_yolo.sh`.
-		- This step will probably fail at first on any non-TX2 device. [See container setup section](### Building Docker container).
-	4. (On Jetson) Start server: `./scripts/start_server_headless.sh`
-	5. (On client) Start test client: `python3 run_client_test.py`
+1. Install Docker and enable non-root docker management
+2. Add `"default-runtime": "nvidia"` to your `/etc/docker/daemon.json`:
+3. Build container: `cd jetson-containers && ./scripts/docker_build_yolo.sh`.
+	- This step will probably fail at first on any non-TX2 device. [See container setup section](### Building Docker container).
+4. (On Jetson) Start server: `./scripts/start_server_headless.sh`
+5. (On client) Start test client: `python3 run_client_test.py`
 
 The rest of this readme has more detail on these steps.
 
