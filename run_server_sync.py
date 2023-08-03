@@ -34,13 +34,13 @@ class ServerSync:
         print(f'Server listening on port {self.args.port}...')
 
 
-    def run_inference(self):
+    def run_inference(self, conf=0.25, return_visualisation=False):
         ret, image = self.video.read()
         timestamp = time.time()
-        origin_img, most_recent_results = self.engine.inference_image(image)
+        origin_img, most_recent_results = self.engine.inference_image(image, conf=conf, do_visualise=return_visualisation)
         most_recent_results['timestamp'] = timestamp
         detections_json = yolojetson.utils.detection_to_json(most_recent_results, class_names=self.engine.class_names)
-        return detections_json
+        return detections_json, origin_image if return_visualisation else detections_json
 
 
 def main(args):

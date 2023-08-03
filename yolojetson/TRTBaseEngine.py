@@ -70,7 +70,7 @@ class TRTBaseEngine(object):
         origin_img = cv2.cvtColor(origin_img, cv2.COLOR_RGB2BGR)                      
         return origin_img
 
-    def inference_image(self, origin_img, conf=0.25):
+    def inference_image(self, origin_img, conf=0.25, do_visualise=False):
         origin_img = cv2.cvtColor(origin_img, cv2.COLOR_BGR2RGB)
         img, ratio = self.preproc(origin_img, self.imgsz, self.mean, self.std)
         num, final_boxes, final_scores, final_cls_inds = self._infer(img)
@@ -80,7 +80,8 @@ class TRTBaseEngine(object):
         detections = {}
         if num > 0:
             detections['boxes'], detections['scores'], detections['cls_inds'] = final_boxes[:num]/ratio, 1+final_scores[:num], final_cls_inds[:num]
-            origin_img = yolojetson.utils.visualise_predictions(origin_img, detections['boxes'], detections['scores'], detections['cls_inds'],
+            if do_visualise:
+                origin_img = yolojetson.utils.visualise_predictions(origin_img, detections['boxes'], detections['scores'], detections['cls_inds'],
                             conf=conf, class_names=self.class_names)
 
         origin_img = cv2.cvtColor(origin_img, cv2.COLOR_RGB2BGR)
