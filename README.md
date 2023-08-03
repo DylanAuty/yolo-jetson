@@ -5,15 +5,21 @@ This repository contains scripts for working with YOLO on an NVIDIA Jetson. Vide
 The work here builds on the work done by Adrian Lopez-Rodriguez and Nelson Da Silva at Imperial College London.
 
 
-## Quickstart tl;dr
+## Quickstart TL;DR
 1. Install Docker and enable non-root docker management
 2. Add `"default-runtime": "nvidia"` to your `/etc/docker/daemon.json`:
 3. Build container: `cd jetson-containers && ./scripts/docker_build_yolo.sh`.
 	- This step will probably fail at first on any non-TX2 device. [See container setup section](### Building Docker container).
 4. (On Jetson) Start server: `./scripts/start_server_headless.sh`
-5. (On client) Start test client: `python3 run_client_test.py`
+	- _Optional:_ view logs with `tail -f ./logs/server_log.txt`
+5. (On client) Start test client: `python3 -m pip install argparse json jsonrpclib-pelix && python3 run_client_test.py`
 
 The rest of this readme has more detail on these steps.
+
+
+## Files
+- `run_client_test.py`: Start the test client. Run with `-h` to see options.
+- `run_server_sync.py`: 
 
 
 ## Environment setup on the Jetson TX2
