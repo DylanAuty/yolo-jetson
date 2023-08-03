@@ -4,6 +4,18 @@ This repository contains scripts for working with YOLO on an NVIDIA Jetson. Vide
 
 The work here builds on the work done by Adrian Lopez-Rodriguez and Nelson Da Silva at Imperial College London.
 
+
+## Quickstart tl;dr
+	1. Install Docker and enable non-root docker management
+	2. Add `"default-runtime": "nvidia"` to your `/etc/docker/daemon.json`:
+	3. Build container: `cd jetson-containers && ./scripts/docker_build_yolo.sh`.
+		- This step will probably fail at first on any non-TX2 device. [See container setup section](### Building Docker container).
+	4. (On Jetson) Start server: `./scripts/start_server_headless.sh`
+	5. (On client) Start test client: `python3 run_client_test.py`
+
+The rest of this readme has more detail on these steps.
+
+
 ## Environment setup on the Jetson TX2
 The application runs inside a Docker image, using the nvidia-container-runtime to give access to the GPU. The docker image is based on the pre-made Jetson docker containers available from [ the jetson-containers repo ](https://github.com/dusty-nv/jetson-containers), but the dockerfile has been modified to include OpenCV compiled from source with GStreamer support.
 
@@ -37,7 +49,7 @@ First modify `jetson-containers/scripts/docker_build_opencv.sh` so that `$cuda_a
 Then run:
 ```bash
 cd jetson-containers
-./scripts/docker-build-yolo.sh
+./scripts/docker_build_yolo.sh
 ```
 which will compile OpenCV into .deb files, tar them together, and put them in `jetson-containers/packages`, before installing them in a new docker image. The new docker image will also have all required Python packages installed.
 
