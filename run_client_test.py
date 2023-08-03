@@ -10,7 +10,7 @@ def main(args):
     while True:
         start_time = time.time()
         if args.visualise:
-            json_response, annotated_image = server.run_inference(conf=0.25, do_visualise=True)
+            json_response, annotated_image = server.run_inference(conf=0.25, return_visualisation=True)
             cv2.imshow('frame', annotated_image)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break

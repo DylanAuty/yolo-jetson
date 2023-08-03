@@ -47,7 +47,7 @@ To start the server from within the Docker container, start the Docker container
 The server and container can be started from outside the Docker container by running `./scripts/start_server_headless.sh`.
 
 ## Running a client
-An example test client that repeatedly polls the server for detections is found in `run_client_test.py`. The server exposes one method: `run_inference()` will grab a video frame, run inference on it, and return a JSON string containing the detections. If visualisations are required, then `run_inference(conf=0.5, do_visualise=True)` can be used, and a tuple of `detections_json, annotated_image` will be returned from the server. `conf` is the confidence threshold in the range [0.0, 1.0] at which an annotation will be drawn onto the image. Image output is off by default for performance reasons.
+An example test client that repeatedly polls the server for detections is found in `run_client_test.py`. The server exposes one method: `run_inference()` will grab a video frame, run inference on it, and return a JSON string containing the detections. If visualisations are required, then `run_inference(conf=0.5, return_visualisation=True)` can be used, and a tuple of `detections_json, annotated_image` will be returned from the server. `conf` is the confidence threshold in the range [0.0, 1.0] at which an annotation will be drawn onto the image. Image output is off by default for performance reasons.
 
 ## JSON Format
 The JSON containing the detections contains:
