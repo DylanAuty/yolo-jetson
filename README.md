@@ -14,12 +14,22 @@ The work here builds on the work done by Adrian Lopez-Rodriguez and Nelson Da Si
 	- _Optional:_ view logs with `tail -f ./logs/server_log.txt`
 5. (On client) Start test client: `python3 -m pip install argparse json jsonrpclib-pelix && python3 run_client_test.py`
 
-The rest of this readme has more detail on these steps.
+Server tested on Python 3.6.9 running on a Jetson TX2 running L4T r32.7.2. Client tested on Python 3.10.8 on the client.
 
 
 ## Files
 - `run_client_test.py`: Start the test client. Run with `-h` to see options.
-- `run_server_sync.py`: 
+- `run_server_sync.py`: To run within docker image. Starts the example server that runs inference on demand and returns a JSON with the detections.
+- `run_server_async.py`: Not currently working, is meant to be a threaded version that runs inference constantly in an attempt to improve FPS at the expense of power consumption.
+- `scripts/`:
+	- `camera_stream_tx.sh <target ip>`: Begin streaming h264-encoded video using RTP over UDP to the target IP on port 5000. 
+	- `camera_stream_rx.sh <listen port>`: Test to receive h264-encoded video from an RTP-over-UDP source. Also includes commented line for JPEG-encoded video. Doesn't always work due to varying availability of display sinks in different environments.
+	- `start_docker.sh`: Start the working docker image in interactive mode.
+	- `start_server_headless.sh`: Start the server within its docker image and have it run in the background. Log output is redirected to `logs/server_log.txt`.
+	- `test_python_webcam.py`: Python script to test GStreamer + CV2 pipelines within python.
+- `jetsoncontainers/`: A fork of the [official jetson-containers repo](https://github.com/dusty-nv/jetson-containers) from NVIDIA.
+	- _Various Dockerfiles_: Not to be used directly. The only two used for this are `Dockerfile.opencv` and `Dockerfile.yolo`.
+	- `scripts/docker_build_yolo.sh`: Will first build OpenCV from source (necessary for GStreamer support), then will build the server image and install dependencies. See below for usage instructions.
 
 
 ## Environment setup on the Jetson TX2
