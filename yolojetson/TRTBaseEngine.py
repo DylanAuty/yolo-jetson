@@ -28,7 +28,7 @@ class TRTBaseEngine(object):
         for binding in engine:
             size = trt.volume(engine.get_binding_shape(binding))
             dtype = engine.get_binding_dtype(binding)
-            if dtype = np.bool: # Update for newer versions of numpy
+            if dtype == np.bool: # Update for newer versions of numpy
                 dtype = bool
             dtype = trt.nptype(dtype)
             host_mem = cuda.pagelocked_empty(size, dtype)
