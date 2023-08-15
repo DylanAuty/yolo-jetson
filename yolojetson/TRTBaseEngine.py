@@ -10,6 +10,8 @@ import tensorrt as trt
 import yolojetson.utils
 import yolojetson.constants
 
+np.bool = bool  # Hack necessary for numpy > 1.2
+
 class TRTBaseEngine(object):
     def __init__(self, engine_path, imgsz=(640,640)):
         self.imgsz = imgsz
@@ -28,8 +30,6 @@ class TRTBaseEngine(object):
         for binding in engine:
             size = trt.volume(engine.get_binding_shape(binding))
             dtype = engine.get_binding_dtype(binding)
-            if dtype == np.bool: # Update for newer versions of numpy
-                dtype = bool
             dtype = trt.nptype(dtype)
             host_mem = cuda.pagelocked_empty(size, dtype)
             device_mem = cuda.mem_alloc(host_mem.nbytes)
