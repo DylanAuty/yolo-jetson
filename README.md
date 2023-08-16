@@ -8,29 +8,29 @@ The work here builds on the work done by Adrian Lopez-Rodriguez and Nelson Da Si
 ## Quickstart TL;DR
 1. Install Docker and enable non-root docker management
 2. Add `"default-runtime": "nvidia"` to your `/etc/docker/daemon.json`:
-3. Build container: `cd jetson-containers && ./scripts/docker_build_yolo.sh`.
-	- This step will probably fail at first on any non-TX2 device. [See container setup section](#building-docker-container).
-4. (On Jetson) Start server: `./scripts/start_server_headless.sh`
+3. Build container: `./scripts/setup_container.sh`
+4. (On Jetson) Start server headless: `./scripts/start_server_headless.sh`
 	- _Optional:_ view logs with `tail -f ./logs/server_log.txt`
+	- _To start interactively:_: `./scripts/start_docker.sh`, then `python3 -m pip install jsonrpclib-pelix && python3 run_server_sync.py`
 5. (On client) Start test client: `python3 -m pip install argparse json jsonrpclib-pelix && python3 run_client_test.py`
 
-Server tested on Python 3.6.9 running on a Jetson TX2 running L4T r32.7.2. Client tested on Python 3.10.8 on the client.
+Server tested on Python 3.8.10 running on a Jetson Orin NX running L4T r35.3.1. Client tested on Python 3.10.8.
 
+You also need checkpoints in `.trt` format. You can download a test version from [this Github release](https://github.com/DylanAuty/yolo-jetson/releases/download/v0.2/yolov7_640-nms.trt). Place it in the `./checkpoints` directory. Note that this checkpoint has not been tuned on fisheye video and is intended for testing the system.
 
 ## Files
 - `run_client_test.py`: Start the test client. Run with `-h` to see options.
 - `run_server_sync.py`: To run within docker image. Starts the example server that runs inference on demand and returns a JSON with the detections.
-- `run_server_async.py`: Not currently working, is meant to be a threaded version that runs inference constantly in an attempt to improve FPS at the expense of power consumption.
+- `run_server_async.py`: **Not currently working** but provided to be a useful starting point if needed, this is meant to be a threaded version that runs inference constantly in an attempt to improve FPS at the expense of power consumption.
 - `scripts/`:
+	- `setup_container.sh`: Convenience script to setup the jetson container.
 	- `camera_stream_tx.sh <target ip>`: Begin streaming h264-encoded video using RTP over UDP to the target IP on port 5000. 
 	- `camera_stream_rx.sh <listen port>`: Test to receive h264-encoded video from an RTP-over-UDP source. Also includes commented line for JPEG-encoded video. Doesn't always work due to varying availability of display sinks in different environments.
 	- `start_docker.sh`: Start the working docker image in interactive mode.
 	- `start_server_headless.sh`: Start the server within its docker image and have it run in the background. Log output is redirected to `logs/server_log.txt`.
 	- `test_python_webcam.py`: Python script to test GStreamer + CV2 pipelines within python.
 - `jetsoncontainers/`: A fork of the [official jetson-containers repo](https://github.com/dusty-nv/jetson-containers) from NVIDIA.
-	- _Various Dockerfiles_: Not to be used directly. The only two used for this are `Dockerfile.opencv` and `Dockerfile.yolo`.
-	- `scripts/docker_build_yolo.sh`: Will first build OpenCV from source (necessary for GStreamer support), then will build the server image and install dependencies. See below for usage instructions.
-
+	- Previously this fork contained modifications to build scripts, but the upstream repo has since had a major overhaul and now works with minimal modification.
 
 ## Environment setup on the Jetson TX2
 The application runs inside a Docker image, using the nvidia-container-runtime to give access to the GPU. The docker image is based on the pre-made Jetson docker containers available from [ the jetson-containers repo](https://github.com/dusty-nv/jetson-containers), but the dockerfile has been modified to include OpenCV compiled from source with GStreamer support.
