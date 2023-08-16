@@ -5,15 +5,16 @@ This repository contains scripts for working with YOLO on an NVIDIA Jetson. Vide
 The work here builds on the work done by Adrian Lopez-Rodriguez and Nelson Da Silva at Imperial College London.
 
 
-## Quickstart TL;DR
+## Quickstart TL;DR (detailed instructions below)
 1. Install Docker and enable non-root docker management
-2. Add `"default-runtime": "nvidia"` to your `/etc/docker/daemon.json`:
-3. Build container: `./scripts/setup_container.sh`
-4. (On camera machine): Start webcam stream: `./scripts/camera_stream_tx.sh <server_ip>`
-5. (On Jetson) Start server headless: `./scripts/start_server_headless.sh`
+2. Install container dependencies: `python3 -m pip install -r jetson-containers/requirements.txt" 
+3. Add `"default-runtime": "nvidia"` to your `/etc/docker/daemon.json`
+4. Build container: `./scripts/setup_container.sh`
+5. (On camera machine): Start webcam stream: `./scripts/camera_stream_tx.sh <server_ip>`
+6. (On Jetson) Start server headless: `./scripts/start_server_headless.sh`
 	- _Optional:_ view logs with `tail -f ./logs/server_log.txt`
 	- _To start from shell within docker container instead:_: `./scripts/start_docker.sh`, then `python3 run_server_sync.py`
-6. (On client) Start test client: `python3 -m pip install argparse json jsonrpclib-pelix && python3 run_client_test.py http://<server_ip>:8080`
+7. (On client) Start test client: `python3 -m pip install argparse json jsonrpclib-pelix && python3 run_client_test.py http://<server_ip>:8080`
 	- The `http://` and port number are necessary.
 
 Server tested on Python 3.8.10 running on a Jetson Orin NX running L4T r35.3.1. Client tested on Python 3.10.8.
