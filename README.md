@@ -9,10 +9,12 @@ The work here builds on the work done by Adrian Lopez-Rodriguez and Nelson Da Si
 1. Install Docker and enable non-root docker management
 2. Add `"default-runtime": "nvidia"` to your `/etc/docker/daemon.json`:
 3. Build container: `./scripts/setup_container.sh`
-4. (On Jetson) Start server headless: `./scripts/start_server_headless.sh`
+4. (On camera machine): Start webcam stream: `./scripts/camera_stream_tx.sh <server_ip>`
+5. (On Jetson) Start server headless: `./scripts/start_server_headless.sh`
 	- _Optional:_ view logs with `tail -f ./logs/server_log.txt`
-	- _To start interactively:_: `./scripts/start_docker.sh`, then `python3 -m pip install jsonrpclib-pelix && python3 run_server_sync.py`
-5. (On client) Start test client: `python3 -m pip install argparse json jsonrpclib-pelix && python3 run_client_test.py`
+	- _To start from shell within docker container instead:_: `./scripts/start_docker.sh`, then `python3 run_server_sync.py`
+6. (On client) Start test client: `python3 -m pip install argparse json jsonrpclib-pelix && python3 run_client_test.py http://<server_ip>:8080`
+	- The `http://` and port number are necessary.
 
 Server tested on Python 3.8.10 running on a Jetson Orin NX running L4T r35.3.1. Client tested on Python 3.10.8.
 
@@ -21,7 +23,7 @@ You also need checkpoints in `.trt` format. You can download a test version from
 ## Files
 - `run_client_test.py`: Start the test client. Run with `-h` to see options.
 - `run_server_sync.py`: To run within docker image. Starts the example server that runs inference on demand and returns a JSON with the detections.
-- `run_server_async.py`: **Not currently working** but provided to be a useful starting point if needed, this is meant to be a threaded version that runs inference constantly in an attempt to improve FPS at the expense of power consumption.
+- `run_server_async.py`: **Not currently working** but provided in case it's useful, this is meant to be a threaded version that runs inference constantly in an attempt to improve FPS at the expense of power consumption.
 - `scripts/`:
 	- `setup_container.sh`: Convenience script to setup the jetson container.
 	- `camera_stream_tx.sh <target ip>`: Begin streaming h264-encoded video using RTP over UDP to the target IP on port 5000. 
@@ -30,17 +32,16 @@ You also need checkpoints in `.trt` format. You can download a test version from
 	- `start_server_headless.sh`: Start the server within its docker image and have it run in the background. Log output is redirected to `logs/server_log.txt`.
 	- `test_python_webcam.py`: Python script to test GStreamer + CV2 pipelines within python.
 - `jetsoncontainers/`: A fork of the [official jetson-containers repo](https://github.com/dusty-nv/jetson-containers) from NVIDIA.
-	- Previously this fork contained modifications to build scripts, but the upstream repo has since had a major overhaul and now works with minimal modification.
+	- Previously this fork contained modifications to container dockerfiles and build scripts, but the upstream repo has since had a major overhaul and now works with minimal modification. Only modification now is a custom package called `python-jsonrpclib-pelix`.
 
-## Environment setup on the Jetson TX2
-The application runs inside a Docker image, using the nvidia-container-runtime to give access to the GPU. The docker image is based on the pre-made Jetson docker containers available from [ the jetson-containers repo](https://github.com/dusty-nv/jetson-containers), but the dockerfile has been modified to include OpenCV compiled from source with GStreamer support.
+## Environment setup
+The application runs inside a Docker image, using the nvidia-container-runtime to give access to the GPU.
 
 ### Docker installation and setup
 First, install Docker according to the distro being used. Then, [set up docker for management as a non-root user](https://docs.docker.com/engine/install/linux-postinstall/):
 ```bash
 sudo groupadd docker
 sudo usermod -aG docker $USER
-newgrp docker
 ```
 
 Modify the default docker runtime by adding `"default-runtime": "nvidia"` to your `/etc/docker/daemon.json`:
@@ -55,19 +56,10 @@ Modify the default docker runtime by adding `"default-runtime": "nvidia"` to you
     "default-runtime": "nvidia"
 }
 ```
-Then reboot the system or restart the Docker daemon before continuing.
+Then reboot the system before continuing.
 
-### Building Docker container
-The version of OpenCV packaged with the off-the-shelf docker images doesn't have GStreamer support. The docker container build script will first compile OpenCV from source with the required support in a single-use container, then will build a fresh container to run the object detection models.
-
-First modify `jetson-containers/scripts/docker_build_opencv.sh` so that `$cuda_arch_bin` matches the CUDA architecture for the target device. The Jetson TX2 architecture is SM62 (or compute_62), so this string should contain "6.2". Then, if needed, modify PYTORCH_VERSION inside `jetson-containers/scripts/docker_build_yolo.sh` to a version that works with the version of L4T flashed to the Jetson. This is used to find the correct starting image. [This page has a list of available images](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-pytorch).
-
-Then run:
-```bash
-cd jetson-containers
-./scripts/docker_build_yolo.sh
-```
-which will compile OpenCV into .deb files, tar them together, and put them in `jetson-containers/packages`, before installing them in a new docker image. The new docker image will also have all required Python packages installed.
+## Building Docker container
+Due to changes to the upstream repo, this is now much simpler: just run `./scripts/setup_container.sh`. This installs all the required dependencies, and will also build OpenCV from source to ensure that GStreamer support is included.
 
 ## Running the server
 To start the server from within the Docker container, start the Docker container and then run `python3 run_server_sync.py`. By default, this will serve over HTTP on port 8080. This can be changed if needed.
