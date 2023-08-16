@@ -7,7 +7,7 @@ The work here builds on the work done by Adrian Lopez-Rodriguez and Nelson Da Si
 
 ## Quickstart TL;DR (detailed instructions below)
 1. (On Jetson): Install Docker and enable non-root docker management
-2. (On Jetson): Install container dependencies: `python3 -m pip install -r jetson-containers/requirements.txt" 
+2. (On Jetson): Install container dependencies: `python3 -m pip install -r jetson-containers/requirements.txt` 
 3. (On Jetson): Add `"default-runtime": "nvidia"` to your `/etc/docker/daemon.json`
 4. (On Jetson): Build container: `./scripts/setup_container.sh`
 5. (On camera machine): Start webcam stream: `./scripts/camera_stream_tx.sh <server_ip>`
