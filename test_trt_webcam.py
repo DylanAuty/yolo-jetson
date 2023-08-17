@@ -34,7 +34,7 @@ def main(args):
     while True:
         start_time = time.time()
         ret, image = video.read()
-        origin_img, most_recent_results = pred.inference_image(image)
+        origin_img, most_recent_results = pred.inference_image(image, do_visualise=True)
         most_recent_results['timestamp'] = start_time
         cv2.imshow('frame', origin_img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
