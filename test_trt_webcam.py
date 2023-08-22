@@ -24,7 +24,7 @@ def main(args):
             ! appsink sync=false drop=true \
             ', cv2.CAP_GSTREAMER)
     print("Setting up prediction engine")
-    pred = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(self.args.resolution[0],self.args.resolution[1]))
+    pred = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(args.resolution[0],args.resolution[1]))
 
     # Main capture/prediction/display loop.
     print("Starting capture loop")
