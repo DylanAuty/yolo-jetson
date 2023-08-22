@@ -19,7 +19,9 @@ The work here builds on the work done by Adrian Lopez-Rodriguez and Nelson Da Si
 
 Server tested on Python 3.8.10 running on a Jetson Orin NX running L4T r35.3.1. Client tested on Python 3.10.8.
 
-You also need checkpoints in `.trt` format. You can download a test version from [this Github release](https://github.com/DylanAuty/yolo-jetson/releases/download/v0.2/yolov7_640-nms.trt). Place it in the `./checkpoints` directory. Note that this checkpoint has not been tuned on fisheye video and is intended for testing the system.
+You also need checkpoints in `.trt` format:
+- You can download a test version from [this Github release](https://github.com/DylanAuty/yolo-jetson/releases/download/v0.2/yolov7_640-nms.trt). Place it in the `./checkpoints` directory. Note that this checkpoint has not been tuned on fisheye video and is intended for testing the system.
+- You can download checkpoints trained on 1280x1280 images with simulated fisheye distortion at a variety of focal lengths from [https://github.com/DylanAuty/yolo-jetson/releases/tag/v0.3](this release). Note that **to use these, the server must be started with the higher resolution specified: `-r 1280x1280`**.
 
 ## Files
 - `run_client_test.py`: Start the test client. Run with `-h` to see options.
