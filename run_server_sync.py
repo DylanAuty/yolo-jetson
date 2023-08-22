@@ -22,7 +22,7 @@ class ServerSync:
                  ! video/x-raw,format=BGR \
                  ! appsink sync=false drop=true \
                  ', cv2.CAP_GSTREAMER)
-        self.engine = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(640,640))
+        self.engine = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(args.resolution[0], args.resolution[1]))
 
 
     def start(self):
@@ -52,6 +52,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--checkpoint', '-c', default='./checkpoints/yolov7_640-nms.trt', help='Path to the tensorrt checkpoint/engine to use.')
+    parser.add_argument('--resolution', '-r', default=(640,640), help='Resolution of video as a tuple (width, height). Should normally be square (640,640) or (1280,1280).')
     parser.add_argument('--video_port', type=int, default=5000, help='Which port to listen on for incoming video')
     parser.add_argument('--port', '-p', type=int, default=8080, help='Which port to serve JSON-RPC requests on.')
 
