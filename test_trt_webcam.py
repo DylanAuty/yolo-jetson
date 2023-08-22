@@ -24,7 +24,7 @@ def main(args):
             ! appsink sync=false drop=true \
             ', cv2.CAP_GSTREAMER)
     print("Setting up prediction engine")
-    pred = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(640,640))
+    pred = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(self.args.resolution[0],self.args.resolution[1]))
 
     # Main capture/prediction/display loop.
     print("Starting capture loop")
@@ -50,6 +50,8 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--checkpoint', default='./checkpoints/yolov7_640-nms.trt', help='Path to the tensorrt checkpoint/engine to use.')
+    parser.add_argument('--resolution', '-r', type=str, default="640,640", help='Resolution of video as a comma separated list (e.g. "width,height"). Should normally be square (640,640 or 1280,1280).')
 
     args = parser.parse_args()
+    args.resolution = [int(item) for item in args.resolution.split(',')]
     main(args)
