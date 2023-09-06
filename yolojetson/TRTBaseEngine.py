@@ -18,12 +18,13 @@ class TRTBaseEngine(object):
         self.mean = None
         self.std = None
         self.class_names = [ 'pedestrian', 'people', 'bicycle', 'car', 'van', 'truck', 'tricycle', 'awning-tricycle', 'bus', 'motor']
-        logger = trt.Logger(trt.Logger.WARNING)
-        trt.init_libnvinfer_plugins(logger,'')
-        runtime = trt.Runtime(logger)
-        with open(engine_path, "rb") as f:
-            serialized_engine = f.read()
-        engine = runtime.deserialize_cuda_engine(serialized_engine)
+
+        self.logger = trt.Logger(trt.Logger.WARNING)
+        trt.init_libnvinfer_plugins(self.logger,'')
+        self.runtime = trt.Runtime(self.logger)
+
+        engine = self.load_engine(engine_path)
+
         self.context = engine.create_execution_context()
         self.inputs, self.outputs, self.bindings = [], [], []
         self.stream = cuda.Stream()
@@ -38,6 +39,13 @@ class TRTBaseEngine(object):
                 self.inputs.append({'host': host_mem, 'device': device_mem})
             else:
                 self.outputs.append({'host': host_mem, 'device': device_mem})
+
+    def load_engine(self, engine_path):
+        assert os.path.exists(engine_path)
+        print(f"Reading engine from file {engine_path}")
+        with open(engine_path, "rb") as f:
+            return self.runtime(deserialize_cuda_engine(f.read())
+
                 
     def _infer(self, img):
         self.inputs[0]['host'] = np.ravel(img)
