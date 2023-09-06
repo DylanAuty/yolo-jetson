@@ -1,6 +1,7 @@
 # TRTBaseEngine.py
 # A class to load a tensorrt engine, and run inference through it.
 import time
+import os
 import cv2
 import pycuda.autoinit
 import pycuda.driver as cuda
@@ -44,7 +45,7 @@ class TRTBaseEngine(object):
         assert os.path.exists(engine_path)
         print(f"Reading engine from file {engine_path}")
         with open(engine_path, "rb") as f:
-            return self.runtime(deserialize_cuda_engine(f.read())
+            return self.runtime(deserialize_cuda_engine(f.read()))
 
                 
     def _infer(self, img):
