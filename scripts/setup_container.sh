@@ -2,5 +2,5 @@
 # Set up the jetson container.
 
 cd jetson-containers/
-./build.sh --name=yolo-jetson opencv_cuda pytorch pycuda torchvision python-jsonrpclib-pelix python-ultralytics
+./build.sh --name=yolo-jetson opencv_cuda pytorch pycuda python-jsonrpclib-pelix python-ultralytics
 cd ..
