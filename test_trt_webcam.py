@@ -5,7 +5,6 @@ import argparse
 import os
 import cv2
 import time
-import datetime
 import json
 
 import yolojetson.utils
