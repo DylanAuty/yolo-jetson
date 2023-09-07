@@ -16,6 +16,8 @@ most_recent_results = {}
 def main(args):
     if args.save_video:
         video_save_dir = os.path.join("saved_runs", f"capture_{time.strftime('%Y-%m-%d_%H-%M-%S')}")
+        if not os.path.exists(video_save_dir):
+            os.makedirs(video_save_dir)
         print(f"Saving video capture to {video_save_dir}")
 
     print("Setting up video stream")

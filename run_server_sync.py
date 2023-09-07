@@ -16,6 +16,8 @@ class ServerSync:
         self.args = args
         if self.args.save_video:
             self.video_save_dir = os.path.join("saved_runs", f"capture_{time.strftime('%Y-%m-%d_%H-%M-%S')}")
+            if not os.path.exists(self.video_save_dir):
+                os.makedirs(self.video_save_dir)
             print(f"Saving video capture to {self.video_save_dir}")
         self.video = VideoCaptureThreading(f'\
                  udpsrc port={args.video_port} \
