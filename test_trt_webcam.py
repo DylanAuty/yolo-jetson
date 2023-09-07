@@ -15,7 +15,7 @@ most_recent_results = {}
 def main(args):
     print("Setting up video stream")
     video = VideoCaptureThreading('\
-            udpsrc address=192.168.53.42 port=5000 \
+            udpsrc port=5000 \
             ! application/x-rtp,clock-rate=90000,encoding-name=H264,payload=96 \
             ! rtpjitterbuffer latency=1000 \
             ! rtph264depay \
