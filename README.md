@@ -13,9 +13,11 @@ The work here builds on the work done by Adrian Lopez-Rodriguez and Nelson Da Si
 5. (On camera machine): Start webcam stream: `./scripts/camera_stream_tx.sh <server_ip>`
 6. (On Jetson) Start server headless: `./scripts/start_server_headless.sh`
 	- _Optional:_ view logs with `tail -f ./logs/server_log.txt`
-	- _To start from shell within docker container instead:_: `./scripts/start_docker.sh`, then `python3 run_server_sync.py`
+	- _To start from shell within docker container instead:_ `./scripts/start_docker.sh`, then `python3 run_server_sync.py`
+	- _To save the output annotated video frames:_ use `python3 run_server_sync.py --save_video`. This will cause a significant drop in framerate.
 7. (On client) Start test client: `python3 -m pip install argparse jsonrpclib-pelix && python3 run_client_test.py -a http://<server_ip>:8080`
 	- The `http://` and port number are necessary.
+
 
 Server tested on Python 3.8.10 running on a Jetson Orin NX running L4T r35.3.1. Client tested on Python 3.10.8.
 
