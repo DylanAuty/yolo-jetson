@@ -33,7 +33,11 @@ def main(args):
             ! appsink sync=false \
             ', cv2.CAP_GSTREAMER)
     print("Setting up prediction engine")
-    pred = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(args.resolution[0],args.resolution[1]))
+    if "yolov8" in args.checkpoint:
+        from ultralytics import YOLO
+        model = YOLO(args.checkpoint)
+    else:
+        pred = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(args.resolution[0],args.resolution[1]))
 
     # Main capture/prediction/display loop.
     print("Starting capture loop")
@@ -43,16 +47,26 @@ def main(args):
     while True:
         start_time = time.time()
         ret, image = video.read()
-        origin_img, most_recent_results = pred.inference_image(image, do_visualise=True)
-        most_recent_results['timestamp'] = start_time
+
+        if "yolov8" in args.checkpoint:
+            origin_img = image
+            results = model(origin_img)
+            origin_img = results[0].plot()
+            most_recent_results = results[0].tojson()
+            json_out = most_recent_results
+        else:
+            origin_img, most_recent_results = pred.inference_image(image, do_visualise=True)
+            most_recent_results['timestamp'] = start_time
+            json_out = yolojetson.utils.detection_to_json(most_recent_results, class_names=pred.class_names)
+
         if args.save_video:
             filename = os.path.join(video_save_dir, f"{str(start_time)}.png")
             cv2.imwrite(filename, origin_img)
+
         cv2.imshow('frame', origin_img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
         cv2.setWindowTitle('frame', f'FPS: {1 / (time.time() - start_time):4.2f}')
-        json_out = yolojetson.utils.detection_to_json(most_recent_results, class_names=pred.class_names)
         print(json_out)
 
     video.release()
