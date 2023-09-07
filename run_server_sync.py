@@ -2,6 +2,7 @@
 # Instantiate and start the JSON-RPC YOLO inference server.
 # This version only runs inference on-demand, and so is slower.
 import argparse
+import os
 import time
 import cv2
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
@@ -13,6 +14,9 @@ from yolojetson.TRTBaseEngine import TRTBaseEngine
 class ServerSync:
     def __init__(self, args):
         self.args = args
+        if self.args.save_video:
+            self.video_save_dir = os.path.join("saved_runs", f"capture_{time.strftime('%Y-%m-%d_%H-%M-%S')}}")
+            print(f"Saving video capture to {self.video_save_dir}")
         self.video = VideoCaptureThreading(f'\
                  udpsrc port={args.video_port} \
                  ! application/x-rtp,clock-rate=90000,encoding-name=H264,payload=96 \
@@ -39,7 +43,10 @@ class ServerSync:
     def run_inference(self):
         ret, image = self.video.read()
         timestamp = time.time()
-        _, most_recent_results = self.engine.inference_image(image, do_visualise=False)
+        annotated_img, most_recent_results = self.engine.inference_image(image, do_visualise=self.args.save_video)
+        if self.args.save_video:
+            filename = os.path.join(self.video_save_dir, f"{str(timestamp)}.png")
+            cv2.imwrite(filename, annotated_img)
         most_recent_results['timestamp'] = timestamp
         detections_json = yolojetson.utils.detection_to_json(most_recent_results, class_names=self.engine.class_names)
         return detections_json
@@ -57,6 +64,7 @@ if __name__ == "__main__":
     parser.add_argument('--resolution', '-r', type=str, default="640,640", help='Resolution of video as a comma separated list (e.g. "width,height"). Should normally be square (640,640 or 1280,1280).')
     parser.add_argument('--video_port', type=int, default=5000, help='Which port to listen on for incoming video')
     parser.add_argument('--port', '-p', type=int, default=8080, help='Which port to serve JSON-RPC requests on.')
+    parser.add_argument('--save_video', action='store_true', help='Save the annotated video frames to a new output directory in saved_runs')
 
     args = parser.parse_args()
     args.resolution = [int(item) for item in args.resolution.split(',')]
