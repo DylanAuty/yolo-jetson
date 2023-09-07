@@ -22,7 +22,7 @@ class ServerSync:
         self.video = VideoCaptureThreading(f'\
                  udpsrc port={args.video_port} \
                  ! application/x-rtp,clock-rate=90000,encoding-name=H264,payload=96 \
-                 ! rtpjitterbuffer latency-1000 \
+                 ! rtpjitterbuffer latency=1000 \
                  ! rtph264depay \
                  ! queue \
                  ! avdec_h264 \
