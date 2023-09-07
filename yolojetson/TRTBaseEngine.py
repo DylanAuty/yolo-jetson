@@ -45,7 +45,7 @@ class TRTBaseEngine(object):
         assert os.path.exists(engine_path)
         print(f"Reading engine from file {engine_path}")
         with open(engine_path, "rb") as f:
-            return self.runtime(deserialize_cuda_engine(f.read()))
+            return self.runtime.deserialize_cuda_engine(f.read())
 
                 
     def _infer(self, img):
