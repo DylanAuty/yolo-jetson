@@ -15,7 +15,7 @@ class ServerSync:
     def __init__(self, args):
         self.args = args
         if self.args.save_video:
-            self.video_save_dir = os.path.join("saved_runs", f"capture_{time.strftime('%Y-%m-%d_%H-%M-%S')}}")
+            self.video_save_dir = os.path.join("saved_runs", f"capture_{time.strftime('%Y-%m-%d_%H-%M-%S')}")
             print(f"Saving video capture to {self.video_save_dir}")
         self.video = VideoCaptureThreading(f'\
                  udpsrc port={args.video_port} \
