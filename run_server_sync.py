@@ -15,12 +15,14 @@ class ServerSync:
         self.args = args
         self.video = VideoCaptureThreading(f'\
                  udpsrc port={args.video_port} \
-                 ! application/x-rtp,encoding-name=H264,payload=96 \
+                 ! application/x-rtp,clock-rate=90000,encoding-name=H264,payload=96 \
+                 ! rtpjitterbuffer latency-1000 \
                  ! rtph264depay \
+                 ! queue \
                  ! avdec_h264 \
                  ! videoconvert \
                  ! video/x-raw,format=BGR \
-                 ! appsink sync=false drop=true \
+                 ! appsink sync=false \
                  ', cv2.CAP_GSTREAMER)
         self.engine = TRTBaseEngine(engine_path=self.args.checkpoint, imgsz=(self.args.resolution[0], self.args.resolution[1]))
 

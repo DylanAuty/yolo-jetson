@@ -15,13 +15,15 @@ most_recent_results = {}
 def main(args):
     print("Setting up video stream")
     video = VideoCaptureThreading('\
-            udpsrc port=5000 \
-            ! application/x-rtp,encoding-name=H264,payload=96 \
+            udpsrc address=192.168.53.42 port=5000 \
+            ! application/x-rtp,clock-rate=90000,encoding-name=H264,payload=96 \
+            ! rtpjitterbuffer latency=1000 \
             ! rtph264depay \
+            ! queue \
             ! avdec_h264 \
             ! videoconvert \
             ! video/x-raw,format=BGR \
-            ! appsink sync=false drop=true \
+            ! appsink sync=false \
             ', cv2.CAP_GSTREAMER)
     print("Setting up prediction engine")
     pred = TRTBaseEngine(engine_path=args.checkpoint, imgsz=(args.resolution[0],args.resolution[1]))
@@ -36,6 +38,8 @@ def main(args):
         ret, image = video.read()
         origin_img, most_recent_results = pred.inference_image(image, do_visualise=True)
         most_recent_results['timestamp'] = start_time
+        filename = 'images/' + str(start_time) + '.jpg'
+        cv2.imwrite(filename, origin_img)
         cv2.imshow('frame', origin_img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
