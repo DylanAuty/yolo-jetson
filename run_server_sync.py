@@ -50,7 +50,7 @@ class ServerSync:
         ret, image = self.video.read()
         timestamp = time.time()
         if "yolov8" in args.checkpoint:
-            results = model(image)
+            results = self.engine(image)
             if self.args.save_video:
                 annotated_img = results[0].plot()
             else:
