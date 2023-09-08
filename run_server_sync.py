@@ -20,7 +20,7 @@ class ServerSync:
                 os.makedirs(self.video_save_dir)
             print(f"Saving video capture to {self.video_save_dir}")
         self.video = VideoCaptureThreading(f'\
-                 udpsrc ip={self.args.video_ip} port={self.args.video_port} \
+                 udpsrc address={self.args.video_ip} port={self.args.video_port} \
                  ! application/x-rtp,clock-rate=90000,encoding-name=H264,payload=96 \
                  ! rtpjitterbuffer latency=1000 \
                  ! rtph264depay \
