@@ -50,7 +50,7 @@ class ServerSync:
         ret, image = self.video.read()
         timestamp = time.time()
         if "yolov8" in args.checkpoint:
-            results = self.engine(image)
+            results = self.engine(image, imgsz=self.args.resolution)
             if self.args.save_video:
                 annotated_img = results[0].plot()
             else:
@@ -78,7 +78,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--checkpoint', '-c', type=str, default='./checkpoints/yolov7_640-nms.trt', help='Path to the tensorrt checkpoint/engine to use.')
-    parser.add_argument('--resolution', '-r', type=str, default="640,640", help='Resolution of video as a comma separated list (e.g. "width,height"). Should normally be square (640,640 or 1280,1280).')
+    parser.add_argument('--resolution', '-r', type=str, default="640,640", help='Resolution of video as a comma separated list (e.g. "width,height"). Should normally be square (640,640 or 1280,1280). Should match checkpoint (e.g. yolov8n-1280 needs 1280x1280 input).')
     parser.add_argument('--video_port', type=int, default=5000, help='Which port to listen on for incoming video')
     parser.add_argument('--video_ip', type=str, default="0.0.0.0", help='Which of this device\'s ips to listen on for incoming video. Necessary for devices with multiple ips on a single interface.')
     parser.add_argument('--server_ip', type=str, default="0.0.0.0", help='Which of this device\'s ips to serve on. Necessary for devices with multiple ips on a single interface.')
