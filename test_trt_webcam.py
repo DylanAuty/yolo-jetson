@@ -22,7 +22,7 @@ def main(args):
 
     print("Setting up video stream")
     video = VideoCaptureThreading(f'\
-            udpsrc ip={args.video_ip} port={args.video_port} \
+            udpsrc address={args.video_ip} port={args.video_port} \
             ! application/x-rtp,clock-rate=90000,encoding-name=H264,payload=96 \
             ! rtpjitterbuffer latency=1000 \
             ! rtph264depay \
