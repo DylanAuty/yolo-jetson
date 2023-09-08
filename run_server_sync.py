@@ -30,7 +30,11 @@ class ServerSync:
                  ! video/x-raw,format=BGR \
                  ! appsink sync=false \
                  ', cv2.CAP_GSTREAMER)
-        self.engine = TRTBaseEngine(engine_path=self.args.checkpoint, imgsz=(self.args.resolution[0], self.args.resolution[1]))
+        if "yolov8" in self.args.checkpoint:
+            from ultralytics import YOLO
+            self.engine = YOLO(args.checkpoint)
+        else:
+            self.engine = TRTBaseEngine(engine_path=self.args.checkpoint, imgsz=(self.args.resolution[0], self.args.resolution[1]))
 
 
     def start(self):
@@ -45,7 +49,17 @@ class ServerSync:
     def run_inference(self):
         ret, image = self.video.read()
         timestamp = time.time()
-        annotated_img, most_recent_results = self.engine.inference_image(image, do_visualise=self.args.save_video)
+        if "yolov8" in args.checkpoint:
+            results = model(image)
+            if self.args.save_video:
+                annotated_img = results[0].plot()
+            else:
+                annotated_img = None
+            most_recent_results = results[0].tojson()
+            json_out = most_recent_results
+        else:
+            annotated_img, most_recent_results = self.engine.inference_image(image, do_visualise=self.args.save_video)
+
         if self.args.save_video:
             filename = os.path.join(self.video_save_dir, f"{str(timestamp)}.png")
             cv2.imwrite(filename, annotated_img)

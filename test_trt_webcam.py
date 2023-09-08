@@ -49,8 +49,7 @@ def main(args):
         ret, image = video.read()
 
         if "yolov8" in args.checkpoint:
-            origin_img = image
-            results = model(origin_img)
+            results = model(image)
             origin_img = results[0].plot()
             most_recent_results = results[0].tojson()
             json_out = most_recent_results
