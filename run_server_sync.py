@@ -36,7 +36,7 @@ class ServerSync:
     def start(self):
         # Start video stream and server
         self.video.start()
-        self.server = SimpleJSONRPCServer(('0.0.0.0', self.args.port))
+        self.server = SimpleJSONRPCServer((self.args.server_ip, self.args.port))
         self.server.register_function(self.run_inference)
         self.server.serve_forever()
         print(f'Server listening on port {self.args.port}...')
@@ -66,6 +66,7 @@ if __name__ == "__main__":
     parser.add_argument('--resolution', '-r', type=str, default="640,640", help='Resolution of video as a comma separated list (e.g. "width,height"). Should normally be square (640,640 or 1280,1280).')
     parser.add_argument('--video_port', type=int, default=5000, help='Which port to listen on for incoming video')
     parser.add_argument('--video_ip', type=str, default="0.0.0.0", help='Which of this device\'s ips to listen on for incoming video. Necessary for devices with multiple ips on a single interface.')
+    parser.add_argument('--server_ip', type=str, default="0.0.0.0", help='Which of this device\'s ips to serve on. Necessary for devices with multiple ips on a single interface.')
     parser.add_argument('--port', '-p', type=int, default=8080, help='Which port to serve JSON-RPC requests on.')
     parser.add_argument('--save_video', action='store_true', help='Save the annotated video frames to a new output directory in saved_runs')
 
