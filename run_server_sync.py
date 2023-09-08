@@ -56,15 +56,16 @@ class ServerSync:
             else:
                 annotated_img = None
             most_recent_results = results[0].tojson()
-            json_out = most_recent_results
+            detections_json = most_recent_results
         else:
             annotated_img, most_recent_results = self.engine.inference_image(image, do_visualise=self.args.save_video)
+            most_recent_results['timestamp'] = timestamp
+            detections_json = yolojetson.utils.detection_to_json(most_recent_results, class_names=self.engine.class_names)
 
         if self.args.save_video:
             filename = os.path.join(self.video_save_dir, f"{str(timestamp)}.png")
             cv2.imwrite(filename, annotated_img)
-        most_recent_results['timestamp'] = timestamp
-        detections_json = yolojetson.utils.detection_to_json(most_recent_results, class_names=self.engine.class_names)
+
         return detections_json
 
 
