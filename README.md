@@ -22,8 +22,49 @@ The work here builds on the work done by Adrian Lopez-Rodriguez and Nelson Da Si
 Server tested on Python 3.8.10 running on a Jetson Orin NX running L4T r35.3.1. Client tested on Python 3.10.8.
 
 You also need checkpoints in `.trt` format:
-- You can download a test version from [this Github release](https://github.com/DylanAuty/yolo-jetson/releases/download/v0.2/yolov7_640-nms.trt). Place it in the `./checkpoints` directory. Note that this checkpoint has not been tuned on fisheye video and is intended for testing the system.
-- You can download checkpoints trained on 1280x1280 images with simulated fisheye distortion at a variety of focal lengths from [https://github.com/DylanAuty/yolo-jetson/releases/tag/v0.3](this release). Note that **to use these, the server must be started with the higher resolution specified: `-r 1280x1280`**.
+- You can download a test YOLOv7 checkpoint from [this Github release](https://github.com/DylanAuty/yolo-jetson/releases/download/v0.2/yolov7_640-nms.trt). Place it in the `./checkpoints` directory. Note that this checkpoint has not been tuned on fisheye video and is intended for testing the system.
+- You can download checkpoints trained on 1280x1280 images with simulated fisheye distortion at a variety of focal lengths from [this release](https://github.com/DylanAuty/yolo-jetson/releases/tag/v0.3). Note that **to use these, the server must be started with the higher resolution specified: `-r 1280x1280`**.
+- You can use YOLOv8 checkpoints of any format (although `.trt`/`.engine` format will be fastest). They must have "yolov8" somewhere in the filename.
+
+## Checkpoints
+
+We supply some pretrained checkpoints based on YOLOv7 and YOLOv8.
+These are YOLOv8 checkpoints fine-tuned for 100 epochs on [VisDrone](https://github.com/VisDrone/VisDrone-Dataset) or [FishDrone-all](https://github.com/Nelson-da-Silva/yolov7_VisDrone), starting from the stock COCO trained checkpoints available from the [official Ultralytics repository](https://github.com/ultralytics/ultralytics). They have been exported as TensorRT `.engine` files on a Jetson Orin NX.
+
+VisDrone is an aerial object detection dataset. FishDrone-all is an augmented version of VisDrone with artificial fisheye distortion at various levels.
+
+The medium (`m`) and nano (`n`) sized models are used. The nano models are trained with input sizes of both 640 and 1280, and the medium models are trained on only 640 due to speed requirements (medium 1280 models are being trained and will be released later). Larger inputs and larger models in general will lead to higher performance at the cost of decreased framerate.
+
+Metrics on **FishDrone-all**:
+
+| Name | Model size | imgsz | Dataset | P | R | mAP50 | mAP50-95 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Stock `yolov8m` | Medium | 640 | COCO | 0.035 | 0.137 | 0.0344 | 0.014 |
+| [`yolov8m-FishDrone-all_e100_640.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8m-FishDrone-all_e100_640.engine) | Medium | 640 | FishDrone-all | 0.542 | 0.398 | 0.417 | 0.246 |
+| [`yolov8m-VisDrone_e100_640.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8m_VisDrone_e100_640.engine) | Medium | 640 | VisDrone | 0.459 | 0.319 | 0.313 | 0.152 |
+|[ `yolov8m-FishDrone-all_e100_1280.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8m_FishDrone-all_e100_1280.engine) | Medium | 1280 | FishDrone-all | 0.615 | 0.514 | 0.536 | 0.309 |
+| [`yolov8m-VisDrone_e100_1280.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8m_VisDrone_e100_1280.engine) | Medium | 1280 | VisDrone | 0.434 | 0.295 | 0.283 | 0.14 |
+| Stock `yolov8n` | Nano | 640 | COCO | 0.0487 | 0.0403 | 0.0269 | 0.0107 |
+|[ `yolov8n_FishDrone-all_e100_1280.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8n_FishDrone-all_e100_1280.engine) |  Nano | 1280 | FishDrone-all | 0.541 | 0.396 |     0.418  |    0.246 |
+| [`yolov8n-FishDrone-all_e100_640.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8n-FishDrone-all_e100_640.engine) |  Nano | 640 | FishDrone-all | 0.444 | 0.310  | 0.317  |  0.178 |
+| [`yolov8n_VisDrone_e100_1280.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8n_VisDrone_e100_1280.engine) |  Nano | 1280 | VisDrone | 0.404   |   0.277    |  0.258  |    0.124
+| [`yolov8n-VisDrone_e100_640.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8n-VisDrone_e100_640.engine) |  Nano | 640 | VisDrone | 0.382    |  0.267  |    0.252  |    0.122 |
+
+Metrics on **VisDrone**:
+
+| Name | Model size | imgsz | Dataset | P | R | mAP50 | mAP50-95 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Stock `yolov8m` | Medium | 640 | COCO | 0.035   |   0.137   |  0.0344  |    0.014 |
+| [`yolov8m-FishDrone-all_e100_640.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8m-FishDrone-all_e100_640.engine) | Medium | 640 | FishDrone-all | 0.527    |  0.399    |   0.410  |    0.234 |
+| [`yolov8m-VisDrone_e100_640.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8m_VisDrone_e100_640.engine) | Medium | 640 | VisDrone | 0.553   |   0.425   |   0.446    |  0.272 |
+| [`yolov8m-FishDrone-all_e100_1280.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8m_FishDrone-all_e100_1280.engine) | Medium | 1280 | FishDrone-all | 0.615   |   0.482   |   0.511   |    0.31 |
+| [`yolov8m-VisDrone_e100_1280.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8m_VisDrone_e100_1280.engine) | Medium | 1280 | VisDrone | 0.548   |   0.455   |   0.468   |   0.293 |
+| Stock `yolov8n` | Nano | 640 | COCO | 0.0638  |   0.0488  |   0.0307    |  0.014 |
+|[ `yolov8n_FishDrone-all_e100_1280.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8n_FishDrone-all_e100_1280.engine) |  Nano | 1280 | FishDrone-all | 0.550   |   0.427   |   0.447   |   0.256 |
+| [`yolov8n-FishDrone-all_e100_640.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8n-FishDrone-all_e100_640.engine) |  Nano | 640 | FishDrone-all | 0.431 |     0.302  |    0.309  |     0.170 |
+| [`yolov8n_VisDrone_e100_1280.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8n_VisDrone_e100_1280.engine) |  Nano | 1280 | VisDrone | 0.512  |    0.431   |   0.437  |    0.268 |
+| [`yolov8n-VisDrone_e100_640.engine`](https://github.com/DylanAuty/yolo-jetson/releases/download/v1.0/yolov8n-VisDrone_e100_640.engine) |  Nano | 640 | VisDrone | 0.451 | 0.342 | 0.343 | 0.201 |
+
 
 ## Files
 - `run_client_test.py`: Start the test client. Run with `-h` to see options.
